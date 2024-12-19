@@ -98,15 +98,15 @@ impl ExtendedQueryHandler for DummyProcessor {
         let t = "ExtendedQueryHandler.do_query".bold();
         println!("{} | {}", t, &_portal.statement.statement);
 
-        let f1 = FieldInfo::new("id".into(), None, None, Type::INT4, FieldFormat::Text);
-        let f2 = FieldInfo::new("name".into(), None, None, Type::VARCHAR, FieldFormat::Text);
+        let f1 = FieldInfo::new("TABLE_SCHEM".into(), None, None, Type::VARCHAR, FieldFormat::Text);
+        let f2 = FieldInfo::new("TABLE_CATALOG".into(), None, None, Type::VARCHAR, FieldFormat::Text);
         let schema = Arc::new(vec![f1, f2]);
 
-        let data = vec![
-            (Some(0), Some("Tom")),
-            (Some(1), Some("Jerry")),
-            (Some(2), None),
-        ];
+        let data: Vec<(Option<&str>, Option<&str>)> = vec![
+                    (Some("public"), None),
+                    (Some("information_schema"), None),
+                    (Some("blah"), None),
+                ];
         let schema_ref = schema.clone();
         let data_row_stream = stream::iter(data.into_iter()).map(move |r| {
             let mut encoder = DataRowEncoder::new(schema_ref.clone());
@@ -144,9 +144,8 @@ impl ExtendedQueryHandler for DummyProcessor {
         let t = "ExtendedQueryHandler.do_describe_portal".bold();
         println!("{} | {}", t, &_portal.statement.statement);
         
-        let f1 = FieldInfo::new("id".into(), None, None, Type::INT4, FieldFormat::Text);
-        let f2 = FieldInfo::new("name".into(), None, None, Type::VARCHAR, FieldFormat::Text);
-        // let schema = Arc::new(vec![f1, f2]);
+        let f1 = FieldInfo::new("TABLE_SCHEM".into(), None, None, Type::VARCHAR, FieldFormat::Text);
+        let f2 = FieldInfo::new("TABLE_CATALOG".into(), None, None, Type::VARCHAR, FieldFormat::Text);
 
         Ok(DescribePortalResponse::new(vec![f1, f2]))
     }
