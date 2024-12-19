@@ -21,7 +21,7 @@ use pgwire::api::results::{
     Response, Tag,
 };
 use pgwire::api::stmt::{NoopQueryParser, StoredStatement};
-use pgwire::api::{ClientInfo, NoopErrorHandler, PgWireHandlerFactory, Type};
+use pgwire::api::{ClientInfo, NoopErrorHandler, PgWireServerHandlers, Type};
 use pgwire::error::PgWireResult;
 use pgwire::tokio::process_socket;
 use tokio::net::TcpListener;
@@ -217,7 +217,7 @@ impl ExtendedQueryHandler for DummyDatabase {
 
 struct DummyDatabaseFactory(Arc<DummyDatabase>);
 
-impl PgWireHandlerFactory for DummyDatabaseFactory {
+impl PgWireServerHandlers for DummyDatabaseFactory {
     type StartupHandler =
         SASLScramAuthStartupHandler<DummyAuthSource, DefaultServerParameterProvider>;
     type SimpleQueryHandler = DummyDatabase;
@@ -280,7 +280,7 @@ pub async fn main() {
     let factory = Arc::new(DummyDatabaseFactory(Arc::new(DummyDatabase::default())));
 
     let server_addr = "127.0.0.1:5432";
-    let tls_acceptor = Arc::new(setup_tls().unwrap());
+    let tls_acceptor = setup_tls().unwrap();
     let listener = TcpListener::bind(server_addr).await.unwrap();
     println!("Listening to {}", server_addr);
     loop {

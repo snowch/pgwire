@@ -156,7 +156,7 @@ struct DummyProcessorFactory {
     handler: Arc<DummyProcessor>,
 }
 
-impl PgWireHandlerFactory for DummyProcessorFactory {
+impl PgWireServerHandlers for DummyProcessorFactory {
     type StartupHandler = DummyProcessor;
     type SimpleQueryHandler = DummyProcessor;
     type ExtendedQueryHandler = DummyProcessor;

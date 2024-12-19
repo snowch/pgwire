@@ -127,6 +127,11 @@ impl<S> ClientPortalStore for DefaultClient<S> {
     }
 }
 
+/// A centralized handler for all errors
+///
+/// This handler captures all errors produces by authentication, query and
+/// copy. You can do logging, filtering or masking the error before it sent to
+/// client.
 pub trait ErrorHandler: Send + Sync {
     fn on_error<C>(&self, _client: &C, _error: &mut PgWireError)
     where
@@ -140,7 +145,7 @@ pub struct NoopErrorHandler;
 
 impl ErrorHandler for NoopErrorHandler {}
 
-pub trait PgWireHandlerFactory {
+pub trait PgWireServerHandlers {
     type StartupHandler: auth::StartupHandler;
     type SimpleQueryHandler: query::SimpleQueryHandler;
     type ExtendedQueryHandler: query::ExtendedQueryHandler;
@@ -158,9 +163,9 @@ pub trait PgWireHandlerFactory {
     fn error_handler(&self) -> Arc<Self::ErrorHandler>;
 }
 
-impl<T> PgWireHandlerFactory for Arc<T>
+impl<T> PgWireServerHandlers for Arc<T>
 where
-    T: PgWireHandlerFactory,
+    T: PgWireServerHandlers,
 {
     type StartupHandler = T::StartupHandler;
     type SimpleQueryHandler = T::SimpleQueryHandler;
