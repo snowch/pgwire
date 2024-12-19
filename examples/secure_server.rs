@@ -16,7 +16,7 @@ use pgwire::api::results::{
     Response, Tag,
 };
 use pgwire::api::stmt::{NoopQueryParser, StoredStatement};
-use pgwire::api::{ClientInfo, NoopErrorHandler, PgWireHandlerFactory, Type};
+use pgwire::api::{ClientInfo, NoopErrorHandler, PgWireServerHandlers, Type};
 use pgwire::error::PgWireResult;
 use pgwire::tokio::process_socket;
 
