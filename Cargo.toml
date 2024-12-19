@@ -16,6 +16,7 @@ rust-version = "1.75"
 [dependencies]
 derive-new = "0.7"
 bytes = "1.1.0"
+colored = "2.2.0"
 thiserror = "2"
 ## api
 tokio = { version = "1.19", features = [
@@ -66,6 +67,7 @@ server-api-aws-lc-rs = ["server-api", "_aws-lc-rs"]
 scram = ["dep:base64", "dep:stringprep", "dep:x509-certificate"]
 _duckdb = []
 _sqlite = []
+_secure_server = []
 _bundled = ["duckdb/bundled", "rusqlite/bundled"]
 
 [dev-dependencies]

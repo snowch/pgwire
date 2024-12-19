@@ -211,12 +211,27 @@ impl ExtendedQueryHandler for SqliteBackend {
     where
         C: ClientInfo + Unpin + Send + Sync,
     {
+
+        //////////////////////////////////////////////////////////////////////
         let conn = self.conn.lock().unwrap();
         let query = &portal.statement.statement;
+        let params = get_params(portal);
+
+        println!("Query: {}", query);
+        println!("Params:");
+        for (i, param) in params.iter().enumerate() {
+            match param.to_sql() {
+                Ok(value) => println!("  Param {}: {:?}", i + 1, value),
+                Err(err) => println!("  Param {}: Error converting to SQL value - {:?}", i + 1, err),
+            }
+        }
+        //////////////////////////////////////////////////////////////////////
+        
+
         let mut stmt = conn
             .prepare_cached(query)
             .map_err(|e| PgWireError::ApiError(Box::new(e)))?;
-        let params = get_params(portal);
+        
         let params_ref = params
             .iter()
             .map(|f| f.as_ref())
@@ -265,6 +280,9 @@ impl ExtendedQueryHandler for SqliteBackend {
         C: ClientInfo + Unpin + Send + Sync,
     {
         let conn = self.conn.lock().unwrap();
+
+        print!("do_describe_portal: {}\n", &portal.statement.statement);
+
         let stmt = conn
             .prepare_cached(&portal.statement.statement)
             .map_err(|e| PgWireError::ApiError(Box::new(e)))?;
@@ -323,11 +341,12 @@ impl PgWireHandlerFactory for SqliteBackendFactory {
 
 #[tokio::main]
 pub async fn main() {
+
     let factory = Arc::new(SqliteBackendFactory {
         handler: Arc::new(SqliteBackend::new()),
     });
 
-    let server_addr = "127.0.0.1:5432";
+    let server_addr = "0.0.0.0:5432";
     let listener = TcpListener::bind(server_addr).await.unwrap();
     println!("Listening to {}", server_addr);
     loop {
